@@ -1,0 +1,6 @@
+project: rnshah9/doxyrest
+target: doxyrest
+
+cmds:
+  - cmd: /doxyrest_b/build/doxyrest/bin/Release/doxyrest @@
+    filepath: /test.xml
