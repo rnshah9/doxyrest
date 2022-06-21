@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 ubuntu:22.04
+FROM --platform=linux/amd64 ubuntu:22.04 as builder
 
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential cmake git libexpat-dev lua5.3-dev ragel
@@ -10,3 +10,12 @@ WORKDIR /doxyrest_b/build
 RUN cmake ..
 RUN make -j8
 
+
+RUN mkdir -p /deps
+RUN ldd /doxyrest_b/build/doxyrest/bin/Release/doxyrest | tr -s '[:blank:]' '\n' | grep '^/' | xargs -I % sh -c 'cp % /deps;'
+
+FROM ubuntu:22.04 as package
+
+COPY --from=builder /deps /deps
+COPY --from=builder /doxyrest_b/build/doxyrest/bin/Release/doxyrest /doxyrest_b/build/doxyrest/bin/Release/doxyrest
+ENV LD_LIBRARY_PATH=/deps
